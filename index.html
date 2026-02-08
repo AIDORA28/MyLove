@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Timeline de Nuestra Historia - Un regalo especial de San Valentín">
+    <meta name="theme-color" content="#1a0a14">
+    <title>Nuestra Historia ❤️</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ============================================
+         HERO SECTION - Portada con fondo 3D
+         ============================================ -->
+    <section id="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-content">
+            <!-- 🔥 PERSONALIZAR: Título principal de la página -->
+            <h1 class="hero-title">
+                <span class="title-line">Nuestra</span>
+                <span class="title-line">Historia</span>
+            </h1>
+            <!-- 🔥 PERSONALIZAR: Subtítulo -->
+            <p class="hero-subtitle">Un viaje a través del tiempo juntos</p>
+            <div class="scroll-indicator">
+                <span>Desliza para descubrir</span>
+                <div class="scroll-arrow"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         COUNTER SECTION - Contador de tiempo
+         ============================================ -->
+    <section id="counter">
+        <div class="container">
+            <!-- 🔥 PERSONALIZAR: Cambia el título de la sección -->
+            <h2 class="section-title">Juntos desde...</h2>
+            <div class="counter-grid">
+                <div class="counter-item">
+                    <div class="counter-value" id="days">0</div>
+                    <div class="counter-label">Días</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="hours">0</div>
+                    <div class="counter-label">Horas</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="minutes">0</div>
+                    <div class="counter-label">Minutos</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="seconds">0</div>
+                    <div class="counter-label">Segundos</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         TIMELINE SECTION - Momentos memorables
+         ============================================ -->
+    <section id="timeline">
+        <div class="container">
+            <!-- 🔥 PERSONALIZAR: Título de la línea de tiempo -->
+            <h2 class="section-title">Momentos que Definen Nuestro Amor</h2>
+
+            <!-- Memory Block 1 -->
+            <div class="memory-block" data-direction="left">
+                <div class="memory-image">
+                    <img src="https://via.placeholder.com/400x600/FF6B9D/FFFFFF?text=Primer+Encuentro"
+                        alt="Nuestro primer encuentro">
+                </div>
+                <div class="memory-content">
+                    <div class="memory-date">Enero 2023</div>
+                    <h3 class="memory-title">El Día Que Todo Comenzó</h3>
+                    <p class="memory-description">
+                        Recuerdo exactamente el momento en que nuestras miradas se cruzaron.
+                        Fue como si el tiempo se detuviera y supiera que algo especial estaba por comenzar.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Memory Block 2 -->
+            <!-- 🔥 PERSONALIZAR: Cambia la imagen, fecha, título y descripción -->
+            <div class="memory-block" data-direction="right">
+                <div class="memory-image">
+                    <img src="https://via.placeholder.com/400x600/C06C84/FFFFFF?text=Primera+Cita" alt="Primera cita">
+                </div>
+                <div class="memory-content">
+                    <div class="memory-date">Febrero 2023</div>
+                    <h3 class="memory-title">Nuestra Primera Cita</h3>
+                    <p class="memory-description">
+                        Nervios, sonrisas y conversaciones que parecían no tener fin.
+                        Esa noche confirmó lo que mi corazón ya sabía: eres especial.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Memory Block 3 -->
+            <div class="memory-block" data-direction="left">
+                <div class="memory-image">
+                    <img src="https://via.placeholder.com/400x600/F67280/FFFFFF?text=Aventuras"
+                        alt="Nuestras aventuras">
+                </div>
+                <div class="memory-content">
+                    <div class="memory-date">Junio 2023</div>
+                    <h3 class="memory-title">Aventuras Inolvidables</h3>
+                    <p class="memory-description">
+                        Cada viaje, cada paseo, cada momento compartido se convirtió en un tesoro.
+                        Juntos hemos creado recuerdos que durarán para siempre.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Memory Block 4 -->
+            <div class="memory-block" data-direction="right">
+                <div class="memory-image">
+                    <img src="https://via.placeholder.com/400x600/FF8C94/FFFFFF?text=Cada+D%C3%ADa"
+                        alt="Cada día juntos">
+                </div>
+                <div class="memory-content">
+                    <div class="memory-date">Cada Día</div>
+                    <h3 class="memory-title">Nuestro Día a Día</h3>
+                    <p class="memory-description">
+                        Los momentos simples son los más hermosos: tus sonrisas, nuestras charlas,
+                        el café de la mañana. Cada día contigo es un regalo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Memory Block 5 -->
+            <div class="memory-block" data-direction="left">
+                <div class="memory-image">
+                    <img src="https://via.placeholder.com/400x600/D65D7A/FFFFFF?text=Nuestro+Futuro"
+                        alt="Nuestro futuro">
+                </div>
+                <div class="memory-content">
+                    <div class="memory-date">Por Venir...</div>
+                    <h3 class="memory-title">Lo Que Nos Espera</h3>
+                    <p class="memory-description">
+                        Este es solo el comienzo de nuestra historia. Juntos construiremos
+                        un futuro lleno de amor, risas y sueños cumplidos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         VIDEO GALLERY - Galería de videos
+         ============================================ -->
+    <section id="video-gallery">
+        <div class="container">
+            <!-- 🔥 PERSONALIZAR: Título de la galería de videos -->
+            <h2 class="section-title">Momentos en Movimiento</h2>
+            <div class="video-grid">
+                <!-- 🔥 PERSONALIZAR: Cambia el atributo data-video="ruta/a/tu/video.mp4" con tu video real -->
+                <div class="video-item" data-video="video1.mp4">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/600x400/FF6B9D/FFFFFF?text=Video+1" alt="Video 1">
+                        <div class="play-button">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                                <circle cx="30" cy="30" r="30" fill="rgba(255,255,255,0.9)" />
+                                <path d="M24 20L40 30L24 40V20Z" fill="#FF6B9D" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="video-caption">Nuestras Risas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FINALE SECTION - Cierre romántico
+         ============================================ -->
+    <section id="finale">
+        <div class="finale-content">
+            <h2 class="finale-title">
+                Te Amo
+                <span class="heart-icon">❤️</span>
+            </h2>
+            <p class="finale-message">
+                Gracias por cada momento, cada sonrisa y cada recuerdo.
+                Eres mi persona favorita y mi lugar favorito para estar.
+            </p>
+            <button class="cta-button" id="finale-button">
+                Para Ti, Con Todo Mi Amor
+            </button>
+        </div>
+    </section>
+
+    <!-- Modal para videos -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <video id="modal-video" controls>
+                <source src="" type="video/mp4">
+                Tu navegador no soporta la reproducción de videos.
+            </video>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS - CDN Libraries
+         ============================================ -->
+    <!-- GSAP Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- GSAP ScrollTrigger Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Custom Scripts (Para Paso 2) -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
