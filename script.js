@@ -207,122 +207,48 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Función para inicializar animaciones GSAP
 function initGSAPAnimations() {
-    // Animar cada bloque de memoria del timeline
+    console.log('🎬 GSAP Animations Initialization');
+
     const memoryBlocks = document.querySelectorAll('.memory-block');
 
     memoryBlocks.forEach((block, index) => {
-        // Animación de entrada del bloque
-        gsap.from(block, {
+        // Aseguramos que la opacidad inicial sea controlada por GSAP
+        gsap.set(block, { opacity: 0, y: 30 });
+
+        gsap.to(block, {
             scrollTrigger: {
                 trigger: block,
-                start: 'top 80%',
-                end: 'bottom 20%',
-                toggleActions: 'play none none reverse',
-                // markers: true, // Descomentar para debug
+                start: 'top 95%', // Aparece mucho antes
+                toggleActions: 'play none none none',
             },
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            ease: 'power3.out',
-            delay: index * 0.1 // Delay escalonado para efecto cascada
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out'
         });
-
-        // Animación de la imagen dentro del bloque
-        const image = block.querySelector('.memory-image');
-        if (image) {
-            gsap.from(image, {
-                scrollTrigger: {
-                    trigger: block,
-                    start: 'top 80%',
-                    end: 'bottom 20%',
-                    toggleActions: 'play none none reverse',
-                },
-                scale: 0.8,
-                rotation: -5,
-                duration: 1.2,
-                ease: 'elastic.out(1, 0.5)',
-                delay: index * 0.1 + 0.2
-            });
-        }
-
-        // Animación del contenido de texto
-        const content = block.querySelector('.memory-content');
-        if (content) {
-            gsap.from(content, {
-                scrollTrigger: {
-                    trigger: block,
-                    start: 'top 80%',
-                    end: 'bottom 20%',
-                    toggleActions: 'play none none reverse',
-                },
-                opacity: 0,
-                x: index % 2 === 0 ? -30 : 30, // Alternar dirección
-                duration: 1,
-                ease: 'power2.out',
-                delay: index * 0.1 + 0.4
-            });
-        }
     });
 
     // Animar sección del contador
     gsap.from('.counter-item', {
         scrollTrigger: {
             trigger: '#counter',
-            start: 'top 70%',
-            toggleActions: 'play none none reverse',
+            start: 'top 85%',
         },
         opacity: 0,
-        scale: 0.5,
-        y: 30,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: 'back.out(1.7)'
+        scale: 0.9,
+        stagger: 0.1,
+        duration: 0.6
     });
 
-    // Animar galería de videos
-    gsap.from('.video-item', {
-        scrollTrigger: {
-            trigger: '#video-gallery',
-            start: 'top 70%',
-            toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 40,
-        stagger: 0.2,
-        duration: 0.8,
-        ease: 'power3.out'
-    });
-
-    // Animar sección finale
-    gsap.from('.finale-content > *', {
-        scrollTrigger: {
-            trigger: '#finale',
-            start: 'top 60%',
-            toggleActions: 'play none none reverse',
-        },
-        opacity: 0,
-        y: 30,
-        stagger: 0.2,
-        duration: 1,
-        ease: 'power3.out'
-    });
-
-    // Efecto parallax en las imágenes del timeline
-    memoryBlocks.forEach(block => {
-        const image = block.querySelector('.memory-image img');
-        if (image) {
-            gsap.to(image, {
-                scrollTrigger: {
-                    trigger: block,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
-                },
-                y: -50,
-                ease: 'none'
-            });
-        }
-    });
+    // Sistema de seguridad: forzar visibilidad tras cargado
+    setTimeout(() => {
+        document.querySelectorAll('.memory-block, .cta-button').forEach(el => {
+            const opacity = window.getComputedStyle(el).opacity;
+            if (opacity === "0" || opacity === "0.0") {
+                gsap.to(el, { opacity: 1, y: 0, duration: 0.5 });
+            }
+        });
+    }, 2500);
 }
 
 // Inicializar animaciones GSAP cuando el DOM esté listo
