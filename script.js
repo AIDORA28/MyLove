@@ -50,8 +50,14 @@ setInterval(updateCounter, 1000);
 // 2. THREE.JS BACKGROUND (El Toque 3D)
 // ============================================
 
+// ============================================
+// 2. THREE.JS BACKGROUND (Experiencia Inmersiva)
+// ============================================
+
 let threeScene, threeCamera, threeRenderer, particleSystem;
+let particlesOriginalPositions;
 let mouseX = 0, mouseY = 0;
+let scrollProgress = 0;
 
 function initThreeJS() {
     const canvas = document.getElementById('hero-canvas');
@@ -60,14 +66,14 @@ function initThreeJS() {
     // Configurar escena
     threeScene = new THREE.Scene();
 
-    // Configurar cámara con perspectiva romántica
+    // Configurar cámara con perspectiva amplia
     threeCamera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
-        1000
+        2000
     );
-    threeCamera.position.z = 30;
+    threeCamera.position.z = 50;
 
     // Configurar renderer con transparencia
     threeRenderer = new THREE.WebGLRenderer({
@@ -78,19 +84,32 @@ function initThreeJS() {
     threeRenderer.setSize(window.innerWidth, window.innerHeight);
     threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Crear sistema de partículas románticas
+    // Crear sistema de partículas
     createParticleSystem();
 
     // Añadir geometría central (corazón abstracto)
     createCenterGeometry();
 
-    // Añadir luces
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Añadir luces profundas
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     threeScene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xff6b9d, 1, 100);
-    pointLight.position.set(10, 10, 10);
+    const pointLight = new THREE.PointLight(0xff6b9d, 2, 100);
+    pointLight.position.set(10, 10, 15);
     threeScene.add(pointLight);
+
+    // Conectar con el Scroll de la página usando GSAP
+    gsap.to({}, {
+        scrollTrigger: {
+            trigger: "body",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1.5,
+            onUpdate: (self) => {
+                scrollProgress = self.progress;
+            }
+        }
+    });
 
     // Iniciar loop de animación
     animateThree();
@@ -102,27 +121,35 @@ function initThreeJS() {
     document.addEventListener('mousemove', onMouseMove);
 }
 
-// Crear sistema de partículas flotantes
+// Crear sistema de partículas flotantes con memoria de posición
 function createParticleSystem() {
-    const particleCount = 1000;
+    const particleCount = 1500;
     const particles = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
+    particlesOriginalPositions = new Float32Array(particleCount * 3);
 
-    // Generar posiciones aleatorias para las partículas
     for (let i = 0; i < particleCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 100;     // x
-        positions[i + 1] = (Math.random() - 0.5) * 100; // y
-        positions[i + 2] = (Math.random() - 0.5) * 100; // z
+        // Posición original (formando una nube esférica/corazón inicial)
+        const x = (Math.random() - 0.5) * 60;
+        const y = (Math.random() - 0.5) * 60;
+        const z = (Math.random() - 0.5) * 60;
+
+        positions[i] = x;
+        positions[i + 1] = y;
+        positions[i + 2] = z;
+
+        particlesOriginalPositions[i] = x;
+        particlesOriginalPositions[i + 1] = y;
+        particlesOriginalPositions[i + 2] = z;
     }
 
     particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // Material de partículas con tono rosa romántico
     const particleMaterial = new THREE.PointsMaterial({
         color: 0xff6b9d,
-        size: 0.3,
+        size: 0.4,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.6,
         blending: THREE.AdditiveBlending
     });
 
@@ -130,16 +157,15 @@ function createParticleSystem() {
     threeScene.add(particleSystem);
 }
 
-// Crear geometría central abstracta (icosaedro romántico)
 function createCenterGeometry() {
-    const geometry = new THREE.IcosahedronGeometry(8, 1);
+    const geometry = new THREE.IcosahedronGeometry(10, 2);
     const material = new THREE.MeshPhongMaterial({
         color: 0xff6b9d,
         wireframe: true,
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.2,
         emissive: 0xc06c84,
-        emissiveIntensity: 0.5
+        emissiveIntensity: 0.8
     });
 
     const centerMesh = new THREE.Mesh(geometry, material);
@@ -147,30 +173,63 @@ function createCenterGeometry() {
     threeScene.add(centerMesh);
 }
 
-// Loop de animación de Three.js
+// Loop de animación optimizado
 function animateThree() {
     requestAnimationFrame(animateThree);
 
-    // Rotar partículas suavemente
+    // Actualizar partículas según el scroll (Efecto Dispersión)
     if (particleSystem) {
-        particleSystem.rotation.y += 0.0005;
-        particleSystem.rotation.x += 0.0002;
+        const positions = particleSystem.geometry.attributes.position.array;
+
+        // El factor de dispersión aumenta con el scroll
+        const scatterFactor = scrollProgress * 150;
+
+        for (let i = 0; i < positions.length; i += 3) {
+            // Movimiento suave de flotación
+            const time = Date.now() * 0.001;
+            const noiseX = Math.sin(time + i) * 0.1;
+            const noiseY = Math.cos(time + i * 1.1) * 0.1;
+
+            // Dispersión radial desde el centro
+            const originX = particlesOriginalPositions[i];
+            const originY = particlesOriginalPositions[i + 1];
+            const originZ = particlesOriginalPositions[i + 2];
+
+            const dist = Math.sqrt(originX * originX + originY * originY + originZ * originZ);
+            const dirX = originX / dist;
+            const dirY = originY / dist;
+            const dirZ = originZ / dist;
+
+            positions[i] = originX + (dirX * scatterFactor) + noiseX;
+            positions[i + 1] = originY + (dirY * scatterFactor) + noiseY;
+            positions[i + 2] = originZ + (dirZ * scatterFactor);
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+
+        particleSystem.rotation.y += 0.001 + (scrollProgress * 0.01);
     }
 
-    // Rotar geometría central
+    // Actualizar geometría central
     const centerMesh = threeScene.getObjectByName('centerMesh');
     if (centerMesh) {
-        centerMesh.rotation.x += 0.003;
-        centerMesh.rotation.y += 0.005;
+        centerMesh.rotation.x += 0.002 + (scrollProgress * 0.02);
+        centerMesh.rotation.y += 0.003 + (scrollProgress * 0.01);
 
-        // Efecto de pulsación (heartbeat)
-        const scale = 1 + Math.sin(Date.now() * 0.001) * 0.1;
-        centerMesh.scale.set(scale, scale, scale);
+        // Desvanecimiento según el scroll
+        centerMesh.material.opacity = 0.2 * (1 - scrollProgress);
+
+        const pulse = 1 + Math.sin(Date.now() * 0.0015) * 0.1;
+        const scrollScale = 1 + scrollProgress * 2;
+        centerMesh.scale.set(pulse * scrollScale, pulse * scrollScale, pulse * scrollScale);
     }
 
-    // Efecto parallax con el mouse
-    threeCamera.position.x += (mouseX * 0.05 - threeCamera.position.x) * 0.05;
-    threeCamera.position.y += (mouseY * 0.05 - threeCamera.position.y) * 0.05;
+    // Movimiento de cámara cinemático según el scroll
+    threeCamera.position.z = 50 + (scrollProgress * 100);
+    threeCamera.rotation.z = scrollProgress * 0.5;
+
+    // Parallax suave con el mouse
+    threeCamera.position.x += (mouseX * 20 - threeCamera.position.x) * 0.05;
+    threeCamera.position.y += (mouseY * 20 - threeCamera.position.y) * 0.05;
     threeCamera.lookAt(threeScene.position);
 
     threeRenderer.render(threeScene, threeCamera);
@@ -191,40 +250,29 @@ function onMouseMove(event) {
     mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
-// Inicializar Three.js cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThreeJS);
-} else {
-    initThreeJS();
-}
+// Inicializar todo
+initThreeJS();
 
 // ============================================
-// 3. GSAP SCROLL ANIMATIONS (La Narrativa)
+// 3. GSAP SCROLL ANIMATIONS (Configuración UI)
 // ============================================
 
-// Registrar el plugin ScrollTrigger
-gsap.registerPlugin(ScrollTrigger);
-
-// Función para inicializar animaciones GSAP
 function initGSAPAnimations() {
-    console.log('🎬 GSAP Animations Initialization');
-
     const memoryBlocks = document.querySelectorAll('.memory-block');
 
     memoryBlocks.forEach((block, index) => {
-        // Aseguramos que la opacidad inicial sea controlada por GSAP
-        gsap.set(block, { opacity: 0, y: 30 });
+        gsap.set(block, { opacity: 0, scale: 0.8 });
 
         gsap.to(block, {
             scrollTrigger: {
                 trigger: block,
-                start: 'top 95%', // Aparece mucho antes
-                toggleActions: 'play none none none',
+                start: 'top 90%',
+                toggleActions: 'play none none reverse',
             },
             opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: 'power2.out'
+            scale: 1,
+            duration: 1,
+            ease: 'power3.out'
         });
     });
 
