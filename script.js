@@ -29,6 +29,7 @@ function initThreeJS() {
     // Crear Elementos
     createAdvancedParticles();
     createGlowMesh();
+    createOrbitingHearts();
 
     // Luces
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -69,26 +70,35 @@ function createAdvancedParticles() {
     const colors = new Float32Array(count * 3);
     particlesOriginalPositions = new Float32Array(count * 3);
 
-    const color1 = new THREE.Color("#FF6B9D");
-    const color2 = new THREE.Color("#C06C84");
+    const color1 = new THREE.Color("#FF0040"); // Rojo pasión
+    const color2 = new THREE.Color("#FFABC7"); // Rosa suave
 
     for (let i = 0; i < count * 3; i += 3) {
-        const radius = Math.random() * 80;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.random() * Math.PI;
+        // Fórmula del Corazón 3D (Ecuaciones Paramétricas)
+        const t = Math.random() * Math.PI * 2; // Ángulo
+        const phi = Math.random() * Math.PI;   // Dispersión para el volumen
 
-        const x = radius * Math.sin(phi) * Math.cos(theta);
-        const y = radius * Math.sin(phi) * Math.sin(theta);
-        const z = radius * Math.cos(phi);
+        // Magia matemática para la forma de corazón:
+        let x = 16 * Math.pow(Math.sin(t), 3);
+        let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        let z = 10 * Math.cos(phi) * Math.sin(t); // Profundidad (volumen)
+
+        // Ajustamos escala y posición (multiplicador para tamaño visual)
+        const scale = 1.2;
+        x = x * scale;
+        y = y * scale;
+        z = z * scale;
 
         positions[i] = x;
         positions[i + 1] = y;
         positions[i + 2] = z;
 
+        // Guardamos las posiciones originales para la animación del scroll
         particlesOriginalPositions[i] = x;
         particlesOriginalPositions[i + 1] = y;
         particlesOriginalPositions[i + 2] = z;
 
+        // Mezcla de colores (Rojos y Rosas intensos)
         const mixedColor = color1.clone().lerp(color2, Math.random());
         colors[i] = mixedColor.r;
         colors[i + 1] = mixedColor.g;
@@ -109,6 +119,46 @@ function createAdvancedParticles() {
 
     particleSystem = new THREE.Points(geometry, material);
     threeScene.add(particleSystem);
+}
+
+// Función para crear mini-corazones orbitando
+let orbitingHearts = [];
+function createOrbitingHearts() {
+    const heartCount = 6;
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, 0);
+    heartShape.bezierCurveTo(0, -3, -5, -3, -5, 0);
+    heartShape.bezierCurveTo(-5, 5, 0, 8, 0, 12);
+    heartShape.bezierCurveTo(0, 8, 5, 5, 5, 0);
+    heartShape.bezierCurveTo(5, -3, 0, -3, 0, 0);
+
+    const geometry = new THREE.ShapeGeometry(heartShape);
+    const material = new THREE.MeshPhongMaterial({
+        color: 0xFF0040,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6,
+        emissive: 0xFF0040,
+        emissiveIntensity: 0.5
+    });
+
+    for (let i = 0; i < heartCount; i++) {
+        const heart = new THREE.Mesh(geometry, material);
+        heart.scale.set(0.2, 0.2, 0.2);
+        heart.rotation.x = Math.PI; // Invertir para que apunte bien
+
+        // Datos de órbita personalizados
+        heart.userData = {
+            distance: 30 + Math.random() * 20,
+            speed: 0.01 + Math.random() * 0.02,
+            angle: (i / heartCount) * Math.PI * 2,
+            offsetY: (Math.random() - 0.5) * 40,
+            rotationSpeed: (Math.random() - 0.5) * 0.05
+        };
+
+        orbitingHearts.push(heart);
+        threeScene.add(heart);
+    }
 }
 
 function createGlowMesh() {
@@ -132,7 +182,7 @@ function animate() {
     const time = Date.now() * 0.001;
 
     if (particleSystem) {
-        particleSystem.rotation.y += 0.001 + (scrollProgress * 0.015);
+        particleSystem.rotation.y += 0.001 + (scrollProgress * 0.005);
 
         const pos = particleSystem.geometry.attributes.position.array;
         for (let i = 0; i < pos.length; i += 3) {
@@ -142,13 +192,28 @@ function animate() {
             const originY = particlesOriginalPositions[iy];
             const originZ = particlesOriginalPositions[iz];
 
-            const factor = 1 + (scrollProgress * 4);
+            const factor = 1 + (scrollProgress * 2.5);
             pos[ix] = originX * factor + Math.sin(time + originY) * 0.5;
             pos[iy] = originY * factor + Math.cos(time + originX) * 0.5;
             pos[iz] = originZ * factor;
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
     }
+
+    // Animar mini-corazones orbitando
+    orbitingHearts.forEach(heart => {
+        heart.userData.angle += heart.userData.speed;
+        heart.position.x = Math.cos(heart.userData.angle) * heart.userData.distance;
+        heart.position.z = Math.sin(heart.userData.angle) * heart.userData.distance;
+        heart.position.y = heart.userData.offsetY;
+
+        heart.rotation.z += heart.userData.rotationSpeed;
+        heart.rotation.y += heart.userData.rotationSpeed;
+
+        // Los mini-corazones también se alejan suavemente con el scroll
+        const orbitFactor = 1 + scrollProgress;
+        heart.position.multiplyScalar(orbitFactor);
+    });
 
     threeCamera.position.z = 60 + (scrollProgress * 150);
     threeCamera.position.x += (mouseX * 20 - threeCamera.position.x) * 0.05;
@@ -175,7 +240,7 @@ function onWindowResize() {
 // 2. COUNTER LOGIC (El Contador)
 // ============================================
 
-const startDate = new Date('2024-02-14T00:00:00');
+const startDate = new Date('2022-10-31T00:00:00');
 function updateCounter() {
     const now = new Date();
     const diff = now - startDate;
@@ -220,10 +285,16 @@ function initUI() {
         item.addEventListener('click', function () {
             const src = this.getAttribute('data-video');
             if (src && modal && modalVideo) {
-                modalVideo.querySelector('source').src = src;
+                // Seteamos el src directamente al video para mayor compatibilidad
+                modalVideo.src = src;
                 modalVideo.load();
                 modal.style.display = 'block';
                 gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+
+                // Intentar reproducir automáticamente al abrir
+                modalVideo.play().catch(error => {
+                    console.log("Auto-play prevented, user interaction required:", error);
+                });
             }
         });
     });
