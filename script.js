@@ -315,11 +315,32 @@ function initUI() {
 
     // Botón Finale
     const finaleBtn = document.getElementById('finale-button');
-    if (finaleBtn) {
+    const surpriseModal = document.getElementById('surprise-modal');
+    const closeSurprise = document.getElementById('close-surprise');
+
+    if (finaleBtn && surpriseModal) {
         finaleBtn.addEventListener('click', () => {
             gsap.to(finaleBtn, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
             triggerLoveRain();
+
+            // Mostrar modal sorpresa
+            surpriseModal.style.display = 'block';
+            gsap.fromTo(surpriseModal, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.7)" });
         });
+    }
+
+    if (closeSurprise) {
+        closeSurprise.onclick = () => {
+            gsap.to(surpriseModal, {
+                opacity: 0, scale: 0.8, duration: 0.3, onComplete: () => {
+                    surpriseModal.style.display = 'none';
+                }
+            });
+        };
+    }
+
+    if (surpriseModal) {
+        surpriseModal.onclick = (e) => { if (e.target === surpriseModal) closeSurprise.onclick(); };
     }
 }
 
